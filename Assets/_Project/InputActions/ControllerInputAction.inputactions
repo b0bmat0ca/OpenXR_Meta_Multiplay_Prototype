@@ -1,0 +1,182 @@
+{
+    "name": "ControllerInputAction",
+    "maps": [
+        {
+            "name": "LeftController",
+            "id": "61bc07ca-713e-40b4-bff8-63f5ad488061",
+            "actions": [
+                {
+                    "name": "TriggerButtonAction",
+                    "type": "Button",
+                    "id": "7041dfff-436e-4793-ac31-1ee3aafd8189",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PrimaryButtonAction",
+                    "type": "Button",
+                    "id": "fb22037d-9b37-457a-820c-750a3c2254d0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SecondoryButtonAction",
+                    "type": "Button",
+                    "id": "d38526fb-d9ed-40ca-ab42-86e0648bb99c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "DevicePosition",
+                    "type": "Value",
+                    "id": "f5396e15-b6c6-43a6-99e8-90c3638dd959",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "bd83783d-5a4b-48aa-a8b2-65f7ca06f64c",
+                    "path": "<XRController>{LeftHand}/{TriggerButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TriggerButtonAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ac3be373-6a49-4b05-9d62-c42ab58a8091",
+                    "path": "<XRController>{LeftHand}/{PrimaryButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PrimaryButtonAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "953c309c-4f84-4a63-a027-01d2974ca7f0",
+                    "path": "<XRController>{LeftHand}/{SecondaryButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SecondoryButtonAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f9780750-f887-4629-8f19-295816501afc",
+                    "path": "<XRController>{LeftHand}/devicePosition",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DevicePosition",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "RightController",
+            "id": "1c02d32c-a19a-4bba-b3a2-0b9c47a99423",
+            "actions": [
+                {
+                    "name": "TriggerButtonAction",
+                    "type": "Button",
+                    "id": "f6a1b7c1-c8cb-40da-a15d-eb45e63cc4ea",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PrimaryButtonAction",
+                    "type": "Button",
+                    "id": "66d1b782-df15-4165-a9dd-ab80031e3a8f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SecondoryButtonAction",
+                    "type": "Button",
+                    "id": "eb371eaf-10ee-441f-916e-dc3072beb653",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "DevicePosition",
+                    "type": "Value",
+                    "id": "e6befb40-cb0d-45e8-b4ed-ec24914db23b",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "89ada5fc-a631-44ea-a265-6d6cb9eeff07",
+                    "path": "<XRController>{RightHand}/{TriggerButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TriggerButtonAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8e698ee4-7bcc-4a94-86b9-6afb3fe6af73",
+                    "path": "<XRController>{RightHand}/{PrimaryButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PrimaryButtonAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fae91dcc-baf8-4d30-b335-247645a750cf",
+                    "path": "<XRController>{RightHand}/{SecondaryButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SecondoryButtonAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e36173c8-5d43-46ff-9c61-0cf16560fde9",
+                    "path": "<XRController>{RightHand}/devicePosition",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DevicePosition",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
