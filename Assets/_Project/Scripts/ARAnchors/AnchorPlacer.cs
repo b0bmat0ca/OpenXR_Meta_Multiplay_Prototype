@@ -43,6 +43,7 @@ namespace b0bmat0ca.OpenXr.ARAnchors
         private readonly string ANCHOR_IDS_KEY = "SavedAnchorIds";
         private readonly string ANCHOR_COUNT_KEY = "SavedAnchorCount";
         
+        #region Unity Lifecycle
         private void Awake()
         {
             Assert.IsNotNull(_anchorManager, "ARAnchorManager is not assigned in AnchorPlacer");
@@ -79,6 +80,10 @@ namespace b0bmat0ca.OpenXr.ARAnchors
             SetupInputActions();
         }
         
+        #endregion
+        
+        #region private methods
+        
         private void EnableInputActions()
         {
             // Right Controller
@@ -105,43 +110,6 @@ namespace b0bmat0ca.OpenXr.ARAnchors
             _leftControllerPositionAction?.action.Disable();
             _leftTriggerButtonAction?.action.Disable();
             _leftPrimaryButtonAction?.action.Disable();
-        }
-        
-        private void SetupSharedAnchorGroup()
-        {
-            try
-            {
-                // 固定グループIDを設定
-                SerializableGuid groupId = new SerializableGuid(Guid.Parse(GenerateGuidFromString(_sharedAnchorGroupId)));
-                bool success = _anchorController.SetSharedAnchorsGroupId(_anchorManager, groupId);
-                
-                if (success)
-                {
-                    Debug.Log($"共有アンカーのグループIDを設定しました: {_sharedAnchorGroupId}");
-                }
-                else
-                {
-                    Debug.LogWarning("共有アンカーのグループID設定に失敗しました");
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"共有アンカーグループID設定エラー: {e.Message}");
-            }
-        }
-        
-        /// <summary>
-        /// 指定された文字列から決定論的なGUIDを生成します。
-        /// 同じ文字列からは常に同じGUIDが返されます。
-        /// </summary>
-        private string GenerateGuidFromString(string input)
-        {
-            using MD5 md5 = MD5.Create();
-            byte[] inputBytes = Encoding.UTF8.GetBytes(input);
-            byte[] hashBytes = md5.ComputeHash(inputBytes);
-            Guid guid = new Guid(hashBytes);
-
-            return guid.ToString();
         }
         
         private void SetupInputActions()
@@ -173,6 +141,8 @@ namespace b0bmat0ca.OpenXr.ARAnchors
                 _leftPrimaryButtonAction.action.performed += OnLeftPrimaryButtonPressed;
             }
         }
+        
+        #endregion
         
         #region Right Controller Event Handlers
         
@@ -207,10 +177,12 @@ namespace b0bmat0ca.OpenXr.ARAnchors
         
         #endregion
         
+        #region ARAnchor Methods
+        
         /// <summary>
-        /// コントローラーの現在位置にアンカーを配置します
+        /// コントローラーの現在位置にアンカーを配置
         /// </summary>
-        public async UniTaskVoid PlaceAnchorAtControllerPosition()
+        private async UniTaskVoid PlaceAnchorAtControllerPosition()
         {
             // コントローラーの位置を取得（回転はWorld座標系で設定）
             Vector3 controllerPosition = GetRightControllerPosition();
@@ -223,24 +195,23 @@ namespace b0bmat0ca.OpenXr.ARAnchors
         }
         
         /// <summary>
-        /// コントローラーの現在位置に共有アンカーを配置します
+        /// 右コントローラーの位置を取得
         /// </summary>
-        public async UniTaskVoid PlaceSharedAnchorAtControllerPosition()
+        private Vector3 GetRightControllerPosition()
         {
-            // コントローラーの位置を取得（回転はWorld座標系で設定）
-            Vector3 controllerPosition = GetLeftControllerPosition();
-            Vector3 anchorPosition = controllerPosition + _anchorOffset;
-            Quaternion anchorRotation = Quaternion.identity; // World座標系の回転
+            if (_rightControllerPositionAction != null && _rightControllerPositionAction.action.enabled)
+            {
+                return _rightControllerPositionAction.action.ReadValue<Vector3>();
+            }
             
-            Pose anchorPose = new Pose(anchorPosition, anchorRotation);
-            
-            await PlaceSharedAnchorAsync(anchorPose);
+            Debug.LogWarning("右コントローラー位置が取得できません。");
+            return Vector3.zero;
         }
         
         /// <summary>
-        /// 保存されているすべてのアンカーをロードします
+        /// 保存されているすべてのアンカーを読み込み
         /// </summary>
-        public async UniTaskVoid LoadAnchors()
+        private async UniTaskVoid LoadAnchors()
         {
             try
             {
@@ -283,43 +254,8 @@ namespace b0bmat0ca.OpenXr.ARAnchors
         }
         
         /// <summary>
-        /// 共有アンカーをロードします
+        /// ARアンカーを配置
         /// </summary>
-        public async UniTaskVoid LoadSharedAnchors()
-        {
-            try
-            {
-                Debug.Log("共有アンカーの読み込みを開始...");
-                
-                // 共有アンカーを読み込んでARAnchorとして取得
-                List<ARAnchor> sharedAnchors = await _anchorController.LoadAndCreateSharedAnchorsAsync(_anchorManager, OnSharedAnchorCreated);
-                
-                Debug.Log($"共有アンカーロード完了: {sharedAnchors.Count}個のアンカーをロードしました");
-                
-                if (sharedAnchors.Count == 0)
-                {
-                    Debug.Log("読み込み可能な共有アンカーがありませんでした");
-                }
-                else
-                {
-                    OnLoadSharedAnchorsCompleted?.Invoke(sharedAnchors);
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"共有アンカーロード中にエラーが発生しました: {e.Message}");
-            }
-        }
-        
-        /// <summary>
-        /// 共有アンカーが作成された際のコールバック
-        /// </summary>
-        private void OnSharedAnchorCreated(ARAnchor anchor)
-        {
-            Debug.Log($"共有アンカーが作成されました: {anchor.trackableId} at {anchor.transform.position}");
-            // 必要に応じてアンカー位置にオブジェクトを配置するなどの処理を追加
-        }
-        
         private async UniTask PlaceAnchorAsync(Pose pose)
         {
             try
@@ -358,70 +294,9 @@ namespace b0bmat0ca.OpenXr.ARAnchors
         }
         
         /// <summary>
-        /// 共有アンカーを配置します
-        /// </summary>
-        private async UniTask PlaceSharedAnchorAsync(Pose pose)
-        {
-            try
-            {
-                Debug.Log($"共有アンカー配置開始: {pose.position}");
-                
-                // ARAnchorControllerを使用してアンカーを作成
-                ARAnchor anchor = await _anchorController.CreateAnchorAsync(_anchorManager, pose);
-                
-                if (anchor != null)
-                {
-                    Debug.Log($"アンカーが正常に配置されました: {anchor.trackableId} at {pose.position}");
-                    
-                    // アンカーを共有
-                    bool shareSuccess = await _anchorController.ShareAnchorAsync(_anchorManager, anchor);
-                    if (shareSuccess)
-                    {
-                        Debug.Log($"アンカーを共有しました: {anchor.trackableId}");
-                    }
-                    else
-                    {
-                        Debug.LogWarning("アンカーの共有に失敗しました");
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("共有アンカーの作成に失敗しました");
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"共有アンカー配置中にエラーが発生しました: {e.Message}");
-                Debug.LogError($"スタックトレース: {e.StackTrace}");
-            }
-        }
-        
-        private Vector3 GetRightControllerPosition()
-        {
-            if (_rightControllerPositionAction != null && _rightControllerPositionAction.action.enabled)
-            {
-                return _rightControllerPositionAction.action.ReadValue<Vector3>();
-            }
-            
-            Debug.LogWarning("右コントローラー位置が取得できません。");
-            return Vector3.zero;
-        }
-        
-        private Vector3 GetLeftControllerPosition()
-        {
-            if (_leftControllerPositionAction != null && _leftControllerPositionAction.action.enabled)
-            {
-                return _leftControllerPositionAction.action.ReadValue<Vector3>();
-            }
-            
-            Debug.LogWarning("左コントローラー位置が取得できません。");
-            return Vector3.zero;
-        }
-        
-        /// <summary>
         /// 現在配置されているすべてのアンカーを削除（PlayerPrefsからも削除）
         /// </summary>
-        public async UniTaskVoid RemoveAllAnchors()
+        private async UniTaskVoid RemoveAllAnchors()
         {
             try
             {
@@ -478,6 +353,157 @@ namespace b0bmat0ca.OpenXr.ARAnchors
                 Debug.LogError($"アンカー削除中にエラーが発生しました: {e.Message}");
             }
         }
+        
+        #endregion
+        
+        #region Shared Anchor Methods
+        
+        /// <summary>
+        /// 共有アンカーのグループIDを設定
+        /// </summary>
+        private void SetupSharedAnchorGroup()
+        {
+            try
+            {
+                // 固定グループIDを設定
+                SerializableGuid groupId = new SerializableGuid(Guid.Parse(GenerateGuidFromString(_sharedAnchorGroupId)));
+                bool success = _anchorController.SetSharedAnchorsGroupId(_anchorManager, groupId);
+                
+                if (success)
+                {
+                    Debug.Log($"共有アンカーのグループIDを設定しました: {_sharedAnchorGroupId}");
+                }
+                else
+                {
+                    Debug.LogWarning("共有アンカーのグループID設定に失敗しました");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"共有アンカーグループID設定エラー: {e.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// 指定された文字列からGUIDを生成
+        /// </summary>
+        private string GenerateGuidFromString(string input)
+        {
+            using MD5 md5 = MD5.Create();
+            byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+            byte[] hashBytes = md5.ComputeHash(inputBytes);
+            Guid guid = new Guid(hashBytes);
+
+            return guid.ToString();
+        }
+        
+        /// <summary>
+        /// コントローラーの現在位置に共有アンカーを配置
+        /// </summary>
+        private async UniTaskVoid PlaceSharedAnchorAtControllerPosition()
+        {
+            // コントローラーの位置を取得（回転はWorld座標系で設定）
+            Vector3 controllerPosition = GetLeftControllerPosition();
+            Vector3 anchorPosition = controllerPosition + _anchorOffset;
+            Quaternion anchorRotation = Quaternion.identity; // World座標系の回転
+            
+            Pose anchorPose = new Pose(anchorPosition, anchorRotation);
+            
+            await PlaceSharedAnchorAsync(anchorPose);
+        }
+        
+        /// <summary>
+        /// 左コントローラーの位置を取得
+        /// </summary>
+        private Vector3 GetLeftControllerPosition()
+        {
+            if (_leftControllerPositionAction != null && _leftControllerPositionAction.action.enabled)
+            {
+                return _leftControllerPositionAction.action.ReadValue<Vector3>();
+            }
+            
+            Debug.LogWarning("左コントローラー位置が取得できません。");
+            return Vector3.zero;
+        }
+        
+        /// <summary>
+        /// 共有アンカーを読み込み
+        /// </summary>
+        private async UniTaskVoid LoadSharedAnchors()
+        {
+            try
+            {
+                Debug.Log("共有アンカーの読み込みを開始...");
+                
+                // 共有アンカーを読み込んでARAnchorとして取得
+                List<ARAnchor> sharedAnchors = await _anchorController.LoadAndCreateSharedAnchorsAsync(_anchorManager, OnSharedAnchorCreated);
+                
+                Debug.Log($"共有アンカーロード完了: {sharedAnchors.Count}個のアンカーをロードしました");
+                
+                if (sharedAnchors.Count == 0)
+                {
+                    Debug.Log("読み込み可能な共有アンカーがありませんでした");
+                }
+                else
+                {
+                    OnLoadSharedAnchorsCompleted?.Invoke(sharedAnchors);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"共有アンカーロード中にエラーが発生しました: {e.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// 共有アンカーが作成された際のコールバック
+        /// </summary>
+        private void OnSharedAnchorCreated(ARAnchor anchor)
+        {
+            Debug.Log($"共有アンカーが作成されました: {anchor.trackableId} at {anchor.transform.position}");
+            // 必要に応じてアンカー位置にオブジェクトを配置するなどの処理を追加
+        }
+        
+        /// <summary>
+        /// 共有アンカーを配置
+        /// </summary>
+        private async UniTask PlaceSharedAnchorAsync(Pose pose)
+        {
+            try
+            {
+                Debug.Log($"共有アンカー配置開始: {pose.position}");
+                
+                // ARAnchorControllerを使用してアンカーを作成
+                ARAnchor anchor = await _anchorController.CreateAnchorAsync(_anchorManager, pose);
+                
+                if (anchor != null)
+                {
+                    Debug.Log($"アンカーが正常に配置されました: {anchor.trackableId} at {pose.position}");
+                    
+                    // アンカーを共有
+                    bool shareSuccess = await _anchorController.ShareAnchorAsync(_anchorManager, anchor);
+                    if (shareSuccess)
+                    {
+                        Debug.Log($"アンカーを共有しました: {anchor.trackableId}");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("アンカーの共有に失敗しました");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("共有アンカーの作成に失敗しました");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"共有アンカー配置中にエラーが発生しました: {e.Message}");
+                Debug.LogError($"スタックトレース: {e.StackTrace}");
+            }
+        }
+        
+        #endregion
         
         #region PlayerPrefs管理
         
@@ -541,7 +567,7 @@ namespace b0bmat0ca.OpenXr.ARAnchors
         /// <summary>
         /// PlayerPrefsから保存されたアンカーIDをすべて削除
         /// </summary>
-        public void ClearSavedAnchorIds()
+        private void ClearSavedAnchorIds()
         {
             int count = PlayerPrefs.GetInt(ANCHOR_COUNT_KEY, 0);
             
