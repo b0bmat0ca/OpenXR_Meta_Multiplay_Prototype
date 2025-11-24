@@ -9,7 +9,7 @@ namespace b0bmat0ca.OpenXr.Multiplayer.Photon
     /// <summary>
     /// 共有アンカーベースのオブジェクト管理クラス
     /// PlayerPrefab以外の共有オブジェクトを管理
-    /// NetworkObjectとAnchoredNetworkObjectで状態を管理（ObjectInfos削除済み）
+    /// NetworkObjectとAnchoredNetworkObjectで状態を管理
     /// </summary>
     public class SharedObjectManager : NetworkBehaviour
     {

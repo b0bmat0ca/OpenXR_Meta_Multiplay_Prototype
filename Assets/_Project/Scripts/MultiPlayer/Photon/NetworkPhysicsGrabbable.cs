@@ -137,7 +137,7 @@ namespace b0bmat0ca.OpenXr.Multiplayer.Photon
         {
             if (_sharedAnchorTransform == null) return;
 
-            // リモートユーザーが掴んでいる場合、RemoteRenderTimeで補間（サンプル準拠）
+            // リモートユーザーが掴んでいる場合、RemoteRenderTimeで補間
             if (CurrentGrabber != null && CurrentGrabber.HasInputAuthority == false)
             {
                 // RemoteRenderTime補間
