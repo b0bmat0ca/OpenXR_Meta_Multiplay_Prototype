@@ -45,6 +45,7 @@
 本プロジェクトの詳細解説は順次公開予定です。
 
 - [OpenXRとMeta Questではじめる！AR/MRアプリの現実世界との位置合わせ - ARアンカー編 -](https://zenn.dev/meson_tech_blog/articles/openxr-meta-anchor)
+- [OpenXRとMeta Questではじめる！AR/MRアプリの現実世界との位置合わせ - ARアンカーの共有編 -](https://zenn.dev/meson_tech_blog/articles/openxr-meta-shared-anchor)
 
 ---
 
